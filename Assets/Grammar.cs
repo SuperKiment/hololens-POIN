@@ -5,11 +5,10 @@ using UnityEngine.Windows.Speech;
 public class Grammar : MonoBehaviour
 {
 
-    DictationRecognizer dictationRecognizer;
-    TextController textController;
+    private DictationRecognizer dictationRecognizer;
+    private TextController textController;
+    public ArrayList requetes;
 
-
-    // Use this for initialization
     void Start()
     {
         textController = GetComponent<TextController>();
@@ -17,17 +16,25 @@ public class Grammar : MonoBehaviour
         dictationRecognizer = new DictationRecognizer();
 
         dictationRecognizer.DictationResult += onDictationResult;
-        dictationRecognizer.DictationHypothesis += onDictationHypothesis;
+        //dictationRecognizer.DictationHypothesis += onDictationHypothesis;
         dictationRecognizer.DictationError += onDictationError;
 
         dictationRecognizer.Start();
+
+        requetes = new ArrayList();
     }
 
     void onDictationResult(string text, ConfidenceLevel confidence)
     {
         // write your logic here
-        Debug.LogFormat("Dictation result: " + text);
-        textController.AddTextAndLine(text);
+        Debug.Log("Phrase trouvée : "+text);
+
+        Requete r = new Requete(text);
+        if (r.aQuelqueChose())
+        {
+            requetes.Add(r);
+            textController.AddTextAndLine(r.codeSortant);
+        }
     }
 
     void onDictationHypothesis(string text)
@@ -40,12 +47,12 @@ public class Grammar : MonoBehaviour
     {
         // write your logic here
         if (cause != DictationCompletionCause.Complete)
-            Debug.LogErrorFormat("Dictation completed unsuccessfully: {0}.", cause);
+            Debug.LogErrorFormat("Bug quelque part : {0}.", cause);
     }
 
     void onDictationError(string error, int hresult)
     {
         // write your logic here
-        Debug.LogErrorFormat("Dictation error: {0}; HResult = {1}.", error, hresult);
+        Debug.LogErrorFormat("Euuuh oep : {0}; HResult = {1}.", error, hresult);
     }
 }
