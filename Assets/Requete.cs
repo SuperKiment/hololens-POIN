@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Diagnostics;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -10,7 +11,22 @@ public class Requete
     public string[] phraseDecoupee;
     public string codeSortant;
 
-    public static string[] motsASupprimer = {"euh", "la", "le"};
+    public static string[] motsASupprimer = {
+        "euh",
+        "la",
+        "le"
+    };
+
+    public static Dictionary<string, RequeteType> motPourRequeteType = new Dictionary<string, RequeteType>()
+    {
+        ["si"] = RequeteType.IF,
+        ["pour"] = RequeteType.FOR,
+        ["tant que"] = RequeteType.WHILE,
+        ["nouvelle fonction"] = RequeteType.DECLARATION_FONCTION,
+        ["nouvelle variable"] = RequeteType.DECLARATION_VARIABLE,
+        ["variable"] = RequeteType.VARIABLE,
+        ["fonction"] = RequeteType.FONCTION,
+    };
 
     public Requete(string p)
     {
@@ -19,6 +35,7 @@ public class Requete
         {
             Process();
         }
+        UnityEngine.Debug.Log(type);
     }
 
     public void Process()
@@ -29,6 +46,8 @@ public class Requete
         {
             codeSortant += (i > 0 ? " "+phraseDecoupee[i] : phraseDecoupee[i]);
         }
+
+        DefinirRequete();
     }
 
     private void Decoupe()
@@ -48,6 +67,14 @@ public class Requete
         for (int i = 0; i < phraseDecoupee.Length; i++)
         {
             phraseDecoupee[i] = (string)mots[i];
+        }
+    }
+
+    private void DefinirRequete()
+    {
+        if (motPourRequeteType.ContainsKey(phraseDecoupee[0]))
+        {
+            type = motPourRequeteType[phraseDecoupee[0]];
         }
     }
 
