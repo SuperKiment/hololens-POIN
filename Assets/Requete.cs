@@ -1,8 +1,7 @@
 using System.Collections;
-using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using Unity.VisualScripting;
 
 public class Requete
 {
@@ -17,7 +16,7 @@ public class Requete
         "le"
     };
 
-    public static Dictionary<string, RequeteType> motPourRequeteType = new Dictionary<string, RequeteType>()
+    public static Dictionary<string, RequeteType> phraseToRequeteDico = new Dictionary<string, RequeteType>()
     {
         ["si"] = RequeteType.IF,
         ["pour"] = RequeteType.FOR,
@@ -42,12 +41,21 @@ public class Requete
     {
         Decoupe();
 
-        for (int i = 0;i<phraseDecoupee.Length;i++)
+        for (int i = 0; i < phraseDecoupee.Length; i++)
         {
-            codeSortant += (i > 0 ? " "+phraseDecoupee[i] : phraseDecoupee[i]);
+            codeSortant += (i > 0 ? " " + phraseDecoupee[i] : phraseDecoupee[i]);
         }
 
-        DefinirRequete();
+        type = DefinirRequete();
+
+        if (type == RequeteType.NULL)
+        {
+            UnityEngine.Debug.Log("Requete pas reconnue");
+        }
+        else
+        {
+            codeSortant = TransformerEnCode(phraseDecoupee);
+        }
     }
 
     private void Decoupe()
@@ -70,13 +78,63 @@ public class Requete
         }
     }
 
-    private void DefinirRequete()
+    private RequeteType DefinirRequete()
     {
+        for (int i = 0; i < phraseToRequeteDico.Count(); i++)
+        {
+            //Tableau de plusieurs mots par exemple : Key : "tant que" -> ["tant", "que"] voilà voilà
+            string[] motsDeRequete = phraseToRequeteDico.Keys.ToArray()[i].Split(" ");
+            int compt = 0;
+            for (int j = 0; j < motsDeRequete.Count(); j++)
+            {
+                if (motsDeRequete[j].Equals(phraseDecoupee[j])) compt++;
+            }
+
+            if (compt == motsDeRequete.Count())
+            {
+                return phraseToRequeteDico[phraseToRequeteDico.Keys.ToArray()[i]];
+            }
+        }
+
+        return RequeteType.NULL;
+
+        /*
         if (motPourRequeteType.ContainsKey(phraseDecoupee[0]))
         {
             type = motPourRequeteType[phraseDecoupee[0]];
         }
+        */
     }
 
     public bool aQuelqueChose() => (codeSortant != null && codeSortant.Length > 0 ? true : false);
+
+    private string TransformerEnCode(string[] phraseD)
+    {
+        string res = "";
+
+        switch (type)
+        {
+            case RequeteType.NULL:
+                return "";
+            case RequeteType.IF:
+                string restePhrase = "";
+                for (int i = 0; i<phraseD.Count(); i++) restePhrase += " "+phraseD[i];
+                return "if ("+restePhrase;
+            case RequeteType.DECLARATION_VARIABLE:
+                return phraseD[2] +" "+ phraseD[3] + ";";
+            case RequeteType.DECLARATION_FONCTION:
+                break;
+            case RequeteType.FONCTION:
+                break;
+            case RequeteType.VARIABLE:
+                break;
+            case RequeteType.FOR:
+                break;
+            case RequeteType.WHILE:
+                break;
+
+        }
+
+        return res;
+    }
 }

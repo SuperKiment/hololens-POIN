@@ -30,7 +30,7 @@ public class TextController : MonoBehaviour
     }
     public void AddTextAndLine(string text)
     {
-        textMesh.text += "\n"+text;
+        textMesh.text += "\n" + text;
     }
 }
 

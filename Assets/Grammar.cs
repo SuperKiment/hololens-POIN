@@ -22,12 +22,19 @@ public class Grammar : MonoBehaviour
         dictationRecognizer.Start();
 
         requetes = new ArrayList();
+
+        Requete r = new Requete("Pour toutes les valeurs");
+        if (r.aQuelqueChose())
+        {
+            requetes.Add(r);
+            textController.AddTextAndLine(r.codeSortant);
+        }
     }
 
     void onDictationResult(string text, ConfidenceLevel confidence)
     {
         // write your logic here
-        Debug.Log("Phrase trouvée : "+text);
+        Debug.Log("Phrase trouvée : " + text);
 
         Requete r = new Requete(text);
         if (r.aQuelqueChose())
