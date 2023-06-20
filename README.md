@@ -15,6 +15,8 @@ git clone https://github.com/superkiment/hololens-POIN.git
 Open Unity on your machine (Editor version : 2022.3.16f) and select `Open Project`.
 Navigate to the cloned repository and choose the project folder to open it in Unity.
 Once the project is open, ensure that you have the necessary dependencies and packages installed as required by Unity and the project itself.
+Install Windows Universal Plateform in the build settings and Player settings/Player/Windows/Publishing Settings, activate the microphone.
+Then in your Settings/Privacy/Speech, activate the toggle.
 Build and run the project in Unity, either on the Unity Editor or by exporting it to your desired platform.
 
 ## Usage
