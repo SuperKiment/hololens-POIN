@@ -660,6 +660,7 @@ PlayerSettings:
     WindowsStoreApps:
       Microphone: True
   metroTargetDeviceFamilies:
+    Desktop: True
     Holographic: True
   metroFTAName: 
   metroFTAFileTypes: []

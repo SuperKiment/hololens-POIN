@@ -7,26 +7,38 @@ public class TextController : MonoBehaviour
 {
     private TextMeshPro textMesh;
     public List<Requete> requetes;
+    public bool isErreurs;
 
     private void Start()
     {
         textMesh = GetComponent<TextMeshPro>();
         Debug.Log(textMesh.text);
         // Accédez au texte et modifiez-le
-        textMesh.text = "Dis un truc";
+        textMesh.text = (isErreurs ? "Ici s'affichent les erreurs" : "Dis un truc");
     }
 
     public void UpdateText(List<Requete> req)
     {
-        requetes = req;
-        if (requetes != null)
+        if (!isErreurs)
         {
-            //Debug.Log("update de texte");
-
-            textMesh.text = "";
-            for (int i = 0; i < requetes.Count; i++)
+            requetes = req;
+            if (requetes != null)
             {
-                textMesh.text += requetes[i].codeSortant + "\n";
+                //Debug.Log("update de texte");
+
+                textMesh.text = "";
+                for (int i = 0; i < requetes.Count; i++)
+                {
+                    if (requetes[i].type != RequeteType.NULL)
+                        textMesh.text += requetes[i].codeSortant + "\n";
+
+                }
+            }
+        } else
+        {
+            if (req[req.Count-1].type == RequeteType.NULL)
+            {
+                ChangeText("Phrase non reconnue : " + req[req.Count-1].phraseDeBase);
             }
         }
     }
@@ -36,7 +48,7 @@ public class TextController : MonoBehaviour
         requetes = req;
     }
 
-    /*
+
     public void ChangeText(string text)
     {
         textMesh.text = text;
@@ -58,6 +70,6 @@ public class TextController : MonoBehaviour
             textMesh.text += "\n" + text;
         }
     }
-    */
+
 }
 

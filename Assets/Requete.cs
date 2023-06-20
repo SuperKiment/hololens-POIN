@@ -5,17 +5,19 @@ using Unity.VisualScripting;
 
 public class Requete
 {
-    RequeteType type;
+    public RequeteType type;
     public string phraseDeBase;
     public string[] phraseDecoupee;
     public string codeSortant;
 
+    //Pour enlever les parasites
     public static string[] motsASupprimer = {
         "euh",
         "la",
         "le"
     };
 
+    //Si on commence la phrase par un de ces strings, on définit la requête
     public static Dictionary<string, RequeteType> phraseToRequeteDico = new Dictionary<string, RequeteType>()
     {
         ["si"] = RequeteType.IF,
@@ -27,14 +29,28 @@ public class Requete
         ["fonction"] = RequeteType.FONCTION,
     };
 
+    //Premier tri des phrases traduisibles
     public static Dictionary<string, string> motsARemplacer = new Dictionary<string, string>()
     {
+        //Plus long
+        ["est inférieur ou égal à"] = "<=",
+        ["est inférieure ou égale à"] = "<=",
+        ["est supérieur ou égal à"] = ">=",
+        ["est supérieure ou égale à"] = ">=",
+        ["est supérieur à"] = ">",
+        ["est supérieure à"] = ">",
+        ["est inférieur à"] = "<",
+        ["est inférieure à"] = "<",
         ["est égal à"] = "==",
         ["est égale à"] = "==",
+        ["ou bien"] = "||",
+
         ["égal"] = "=",
-        ["égal"] = "==",
+        ["égale"] = "=",
+
         ["et puis"] = "&&",
-        ["ou"] = "||"
+        //Plus court
+        //Pr éviter genre ça : if (variable 1 est supérieur ou = à variable... bruh
     };
 
     public Requete(string p)
@@ -44,15 +60,18 @@ public class Requete
         {
             Process();
         }
-        UnityEngine.Debug.Log(type);
+        UnityEngine.Debug.Log("Type de requete : " + type);
     }
 
     public void Process()
     {
+        //Premier tri
         phraseDeBase = RemplacerMots(phraseDeBase);
 
+        //On enleve les parasites
         Decoupe();
 
+        //Recréation de la phrase dans le code sortant
         for (int i = 0; i < phraseDecoupee.Length; i++)
         {
             codeSortant += (i > 0 ? " " + phraseDecoupee[i] : phraseDecoupee[i]);
@@ -60,20 +79,19 @@ public class Requete
 
         type = DefinirRequete();
 
-        if (type == RequeteType.NULL)
-        {
-            UnityEngine.Debug.Log("Requete pas reconnue");
-        }
-        else
-        {
+        if (type == RequeteType.NULL) UnityEngine.Debug.Log("Requete pas reconnue");
+        else 
+            //Si la phrase a un type de requête on transforme en code ! 
             codeSortant = TransformerEnCode(phraseDecoupee);
-        }
+
     }
 
     private void Decoupe()
     {
         phraseDecoupee = phraseDeBase.Split(' ');
-        ArrayList mots = new ArrayList();
+        List<string> mots = new List<string>();
+
+        //On enlève tous les mots à supprimer
         for (int i = 0; i < phraseDecoupee.Length; i++)
         {
             if (!motsASupprimer.Contains(phraseDecoupee[i]))
@@ -86,12 +104,13 @@ public class Requete
 
         for (int i = 0; i < phraseDecoupee.Length; i++)
         {
-            phraseDecoupee[i] = (string)mots[i];
+            phraseDecoupee[i] = mots[i];
         }
     }
 
     private RequeteType DefinirRequete()
     {
+        //Si on a plus qu'un mot
         if (phraseDecoupee.Count() > 1)
         {
             for (int i = 0; i < phraseToRequeteDico.Count(); i++)
@@ -125,6 +144,8 @@ public class Requete
 
     private string TransformerEnCode(string[] phraseD)
     {
+        //Là c'est le bordel, faudra VRAIMENT faire du ménage genre
+        //un dico qui a tous els types de requetes et qui est associé à des fonction de traitement ?
         string res = "";
 
         switch (type)
@@ -134,7 +155,7 @@ public class Requete
             case RequeteType.IF:
                 string restePhrase = "";
                 for (int i = 0; i < phraseD.Count(); i++) restePhrase += " " + (phraseD[i].Equals("si") ? "" : phraseD[i]);
-                return "if (" + restePhrase;
+                return "if (" + restePhrase+") {";
             case RequeteType.DECLARATION_VARIABLE:
                 return phraseD[2] + " " + phraseD[3] + ";";
             case RequeteType.DECLARATION_FONCTION:

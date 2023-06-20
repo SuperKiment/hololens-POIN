@@ -6,18 +6,26 @@ using System.Linq;
 
 public class Grammar : MonoBehaviour
 {
-
+    //Le reconnaisseur de mots
     private DictationRecognizer dictationRecognizer;
-    private TextController textController;
+
+    //Les displays de texte
+    private TextController textePrincipal, textErreurs;
+
+    //Liste de toutes les requetes
     public List<Requete> requetes;
 
     void Start()
     {
-        textController = GetComponent<TextController>();
-        textController.setArrayRequetes(requetes);
+        //On trouve les deux displays de texte
+        textePrincipal = GameObject.Find("Texte").GetComponent<TextController>();
+        textePrincipal.setArrayRequetes(requetes);
+
+        textErreurs = GameObject.Find("Erreurs").GetComponent<TextController>();
+        textErreurs.setArrayRequetes(requetes);
 
         dictationRecognizer = new DictationRecognizer();
-
+        //Ajout de la fonction onDictationResult à l'event
         dictationRecognizer.DictationResult += onDictationResult;
         //dictationRecognizer.DictationHypothesis += onDictationHypothesis;
         dictationRecognizer.DictationError += onDictationError;
@@ -29,72 +37,34 @@ public class Grammar : MonoBehaviour
 
     void onDictationResult(string text, ConfidenceLevel confidence)
     {
-        // write your logic here
         Debug.Log("Phrase trouvée : " + text);
 
         Requete r = new Requete(text);
+        //Si la requete n'est pas vide
         if (r.aQuelqueChose())
         {
             requetes.Add(r);
-            textController.UpdateText(requetes);
+            textePrincipal.UpdateText(requetes);
+            textErreurs.UpdateText(requetes);
         }
     }
 
+    //Utilisé que en débug
     void onDictationHypothesis(string text)
     {
         // write your logic here
         Debug.LogFormat("Dictation hypothesis: {0}", text);
     }
-
     void onDictationComplete(DictationCompletionCause cause)
     {
         // write your logic here
         if (cause != DictationCompletionCause.Complete)
             Debug.LogErrorFormat("Bug quelque part : {0}.", cause);
     }
-
     void onDictationError(string error, int hresult)
     {
         // write your logic here
         Debug.LogErrorFormat("Euuuh oep : {0}; HResult = {1}.", error, hresult);
     }
 
-
-
-
-
-
-    public static Dictionary<string, string> motsARemplacer = new Dictionary<string, string>()
-    {
-        ["est égal à"] = "==",
-        ["est égale à"] = "==",
-        ["égal"] = "=",
-        ["égal"] = "==",
-        ["et puis"] = "&&",
-        ["ou"] = "||"
-    };
-
-    private string RemplacerMots(string baseStr)
-    {
-        for (int i = 0; i < motsARemplacer.Count(); i++)
-        {
-            string key = motsARemplacer.Keys.ToArray()[i];
-            baseStr = RemplacerPortionString(baseStr, key, motsARemplacer[key]);
-        }
-
-        return baseStr;
-    }
-
-    private string RemplacerPortionString(string source, string portionARemplacer, string nouvellePortion)
-    {
-        int index = source.IndexOf(portionARemplacer);
-
-        if (index != -1)
-        {
-            source = source.Remove(index, portionARemplacer.Length);
-            source = source.Insert(index, nouvellePortion);
-        }
-
-        return source;
-    }
 }
