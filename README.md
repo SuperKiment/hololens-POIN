@@ -2,7 +2,7 @@
  
 ## Description
 
-This project, named RA Code" (Râh or Rê as the egyptian god and Réalité Augmentée in franch) is a school project developed using Unity, a popular game development engine. The primary feature of this project is the integration of the Windows built-in voice recognizer, which allows users to code using voice commands. The aim is to be able to export it on AR glasses to code while walking for exemple.
+This project, named RA Code" (Râh or Rê as the egyptian god and Réalité Augmentée in french) is a school project developed using Unity, a popular game development engine. The primary feature of this project is the integration of the Windows built-in voice recognizer, which allows users to code using voice commands. The aim is to be able to export it on AR glasses to code while walking for exemple.
 
 ## Installation
 
