@@ -27,6 +27,16 @@ public class Requete
         ["fonction"] = RequeteType.FONCTION,
     };
 
+    public static Dictionary<string, string> motsARemplacer = new Dictionary<string, string>()
+    {
+        ["est égal à"] = "==",
+        ["est égale à"] = "==",
+        ["égal"] = "=",
+        ["égal"] = "==",
+        ["et puis"] = "&&",
+        ["ou"] = "||"
+    };
+
     public Requete(string p)
     {
         phraseDeBase = p.ToLower();
@@ -39,6 +49,8 @@ public class Requete
 
     public void Process()
     {
+        phraseDeBase = RemplacerMots(phraseDeBase);
+
         Decoupe();
 
         for (int i = 0; i < phraseDecoupee.Length; i++)
@@ -80,19 +92,22 @@ public class Requete
 
     private RequeteType DefinirRequete()
     {
-        for (int i = 0; i < phraseToRequeteDico.Count(); i++)
+        if (phraseDecoupee.Count() > 1)
         {
-            //Tableau de plusieurs mots par exemple : Key : "tant que" -> ["tant", "que"] voilà voilà
-            string[] motsDeRequete = phraseToRequeteDico.Keys.ToArray()[i].Split(" ");
-            int compt = 0;
-            for (int j = 0; j < motsDeRequete.Count(); j++)
+            for (int i = 0; i < phraseToRequeteDico.Count(); i++)
             {
-                if (motsDeRequete[j].Equals(phraseDecoupee[j])) compt++;
-            }
+                //Tableau de plusieurs mots par exemple : Key : "tant que" -> ["tant", "que"] voilà voilà
+                string[] motsDeRequete = phraseToRequeteDico.Keys.ToArray()[i].Split(" ");
+                int compt = 0;
+                for (int j = 0; j < motsDeRequete.Count(); j++)
+                {
+                    if (motsDeRequete[j].Equals(phraseDecoupee[j])) compt++;
+                }
 
-            if (compt == motsDeRequete.Count())
-            {
-                return phraseToRequeteDico[phraseToRequeteDico.Keys.ToArray()[i]];
+                if (compt == motsDeRequete.Count())
+                {
+                    return phraseToRequeteDico[phraseToRequeteDico.Keys.ToArray()[i]];
+                }
             }
         }
 
@@ -118,10 +133,10 @@ public class Requete
                 return "";
             case RequeteType.IF:
                 string restePhrase = "";
-                for (int i = 0; i<phraseD.Count(); i++) restePhrase += " "+phraseD[i];
-                return "if ("+restePhrase;
+                for (int i = 0; i < phraseD.Count(); i++) restePhrase += " " + (phraseD[i].Equals("si") ? "" : phraseD[i]);
+                return "if (" + restePhrase;
             case RequeteType.DECLARATION_VARIABLE:
-                return phraseD[2] +" "+ phraseD[3] + ";";
+                return phraseD[2] + " " + phraseD[3] + ";";
             case RequeteType.DECLARATION_FONCTION:
                 break;
             case RequeteType.FONCTION:
@@ -136,5 +151,29 @@ public class Requete
         }
 
         return res;
+    }
+
+    private string RemplacerMots(string baseStr)
+    {
+        for (int i = 0; i < motsARemplacer.Count(); i++)
+        {
+            string key = motsARemplacer.Keys.ToArray()[i];
+            baseStr = RemplacerPortionString(baseStr, key, motsARemplacer[key]);
+        }
+
+        return baseStr;
+    }
+
+    private string RemplacerPortionString(string source, string portionARemplacer, string nouvellePortion)
+    {
+        int index = source.IndexOf(portionARemplacer);
+
+        if (index != -1)
+        {
+            source = source.Remove(index, portionARemplacer.Length);
+            source = source.Insert(index, nouvellePortion);
+        }
+
+        return source;
     }
 }

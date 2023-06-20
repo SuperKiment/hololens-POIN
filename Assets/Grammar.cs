@@ -1,17 +1,20 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.Windows.Speech;
+using System.Collections.Generic;
+using System.Linq;
 
 public class Grammar : MonoBehaviour
 {
 
     private DictationRecognizer dictationRecognizer;
     private TextController textController;
-    public ArrayList requetes;
+    public List<Requete> requetes;
 
     void Start()
     {
         textController = GetComponent<TextController>();
+        textController.setArrayRequetes(requetes);
 
         dictationRecognizer = new DictationRecognizer();
 
@@ -21,14 +24,7 @@ public class Grammar : MonoBehaviour
 
         dictationRecognizer.Start();
 
-        requetes = new ArrayList();
-
-        Requete r = new Requete("Pour toutes les valeurs");
-        if (r.aQuelqueChose())
-        {
-            requetes.Add(r);
-            textController.AddTextAndLine(r.codeSortant);
-        }
+        requetes = new List<Requete>();
     }
 
     void onDictationResult(string text, ConfidenceLevel confidence)
@@ -40,7 +36,7 @@ public class Grammar : MonoBehaviour
         if (r.aQuelqueChose())
         {
             requetes.Add(r);
-            textController.AddTextAndLine(r.codeSortant);
+            textController.UpdateText(requetes);
         }
     }
 
@@ -61,5 +57,44 @@ public class Grammar : MonoBehaviour
     {
         // write your logic here
         Debug.LogErrorFormat("Euuuh oep : {0}; HResult = {1}.", error, hresult);
+    }
+
+
+
+
+
+
+    public static Dictionary<string, string> motsARemplacer = new Dictionary<string, string>()
+    {
+        ["est égal à"] = "==",
+        ["est égale à"] = "==",
+        ["égal"] = "=",
+        ["égal"] = "==",
+        ["et puis"] = "&&",
+        ["ou"] = "||"
+    };
+
+    private string RemplacerMots(string baseStr)
+    {
+        for (int i = 0; i < motsARemplacer.Count(); i++)
+        {
+            string key = motsARemplacer.Keys.ToArray()[i];
+            baseStr = RemplacerPortionString(baseStr, key, motsARemplacer[key]);
+        }
+
+        return baseStr;
+    }
+
+    private string RemplacerPortionString(string source, string portionARemplacer, string nouvellePortion)
+    {
+        int index = source.IndexOf(portionARemplacer);
+
+        if (index != -1)
+        {
+            source = source.Remove(index, portionARemplacer.Length);
+            source = source.Insert(index, nouvellePortion);
+        }
+
+        return source;
     }
 }
