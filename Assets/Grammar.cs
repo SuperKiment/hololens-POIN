@@ -33,6 +33,11 @@ public class Grammar : MonoBehaviour
         dictationRecognizer.Start();
 
         requetes = new List<Requete>();
+
+        Requete r = new Requete("Si la variable test est égale à la variable alors test incrémente");
+        requetes.Add(r);
+        textePrincipal.UpdateText(requetes);
+        textErreurs.UpdateText(requetes);
     }
 
     void onDictationResult(string text, ConfidenceLevel confidence)

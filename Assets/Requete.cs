@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,6 +54,12 @@ public class Requete
         //Pr éviter genre ça : if (variable 1 est supérieur ou = à variable... bruh
     };
 
+    //J'ai passé 10min à initialiser ce truc chuis un ptn de génie
+    public Dictionary<RequeteType, Func<string[], string>> requeteTypeVersAction = new Dictionary<RequeteType, Func<string[], string>>()
+    {
+        [RequeteType.IF] = TraitementIF
+    };
+
     public Requete(string p)
     {
         phraseDeBase = p.ToLower();
@@ -80,7 +87,7 @@ public class Requete
         type = DefinirRequete();
 
         if (type == RequeteType.NULL) UnityEngine.Debug.Log("Requete pas reconnue");
-        else 
+        else
             //Si la phrase a un type de requête on transforme en code ! 
             codeSortant = TransformerEnCode(phraseDecoupee);
 
@@ -107,7 +114,6 @@ public class Requete
             phraseDecoupee[i] = mots[i];
         }
     }
-
     private RequeteType DefinirRequete()
     {
         //Si on a plus qu'un mot
@@ -139,15 +145,13 @@ public class Requete
         }
         */
     }
-
     public bool aQuelqueChose() => (codeSortant != null && codeSortant.Length > 0 ? true : false);
-
     private string TransformerEnCode(string[] phraseD)
     {
-        //Là c'est le bordel, faudra VRAIMENT faire du ménage genre
-        //un dico qui a tous els types de requetes et qui est associé à des fonction de traitement ?
-        string res = "";
+        //Eh wola ce truc m'a pété le crane mais qu'est-ce que c'est pratique
+        return requeteTypeVersAction[type](phraseD);
 
+        /*
         switch (type)
         {
             case RequeteType.NULL:
@@ -170,11 +174,13 @@ public class Requete
                 break;
 
         }
+        */
 
-        return res;
+
+        //return res;
     }
 
-    private string RemplacerMots(string baseStr)
+    private static string RemplacerMots(string baseStr)
     {
         for (int i = 0; i < motsARemplacer.Count(); i++)
         {
@@ -184,8 +190,7 @@ public class Requete
 
         return baseStr;
     }
-
-    private string RemplacerPortionString(string source, string portionARemplacer, string nouvellePortion)
+    private static string RemplacerPortionString(string source, string portionARemplacer, string nouvellePortion)
     {
         int index = source.IndexOf(portionARemplacer);
 
@@ -196,5 +201,10 @@ public class Requete
         }
 
         return source;
+    }
+
+    private static string TraitementIF(string[] phraseD)
+    {
+        return "LEZ GOOO";
     }
 }
