@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Unity.VisualScripting;
+using UnityEngine;
 
 public class Requete
 {
@@ -55,8 +57,6 @@ public class Requete
         ["égal"] = "=",
         ["égale"] = "=",
 
-        ["fin"] = "}",
-
         ["et puis"] = "&&",
         //Plus court
         //Pr éviter genre ça : if (variable 1 est supérieur ou = à variable... bruh
@@ -70,6 +70,7 @@ public class Requete
         [RequeteType.FOR] = TraitementFOR,
         [RequeteType.FONCTION] = TraitementFONCTION,
         [RequeteType.FIN] = TraitementFIN,
+        [RequeteType.DECLARATION_FONCTION] = TraitementDECLARATIONFONCTION,
     };
 
     public Requete(string p)
@@ -224,7 +225,7 @@ public class Requete
         {
             indexAlors = Array.IndexOf(phraseD, "alors");
         }
-        for (int i = 1; i <= indexAlors-1; i++)
+        for (int i = 1; i <= indexAlors - 1; i++)
         {
             if (!phraseD[i].Equals("variable"))
                 code += (i == 1 ? "" : " ") + phraseD[i];
@@ -261,14 +262,40 @@ public class Requete
         int indexAllant = Array.IndexOf(phraseD, "allant");
         int indexJusquA = Array.IndexOf(phraseD, "à");
 
-        code += phraseD[indexAllant + 2] + "; "+variable+"<"+ phraseD[indexJusquA + 1];
+        code += phraseD[indexAllant + 2] + "; " + variable + "<" + phraseD[indexJusquA + 1];
 
-        return "for (int " + code +"; "+variable +"++) {";
+        return "for (int " + code + "; " + variable + "++) {";
     }
 
     private static string TraitementFONCTION(string[] phraseD)
     {
         return "Faire fonction";
+    }
+
+    private static string TraitementDECLARATIONFONCTION(string[] phraseD)
+    {
+        if (phraseD.Count() >= 4)
+        {
+            string[] camel = new string[phraseD.Count() - 3];
+
+            for (int i = 3; i < phraseD.Count(); i++) camel[i - 3] = phraseD[i];
+
+            int indexPrenant = 0;
+            string[] suite = new string[phraseD.Count() - indexPrenant];
+            if (phraseD.Contains("prenant"))
+            {
+                indexPrenant = Array.IndexOf(phraseD, "prenant");
+
+                suite = new string[phraseD.Count() - indexPrenant];
+                for (int i = indexPrenant + 1; i < phraseD.Count(); i++)
+                {
+                    suite[i - indexPrenant] = phraseD[i];
+                }
+            }
+
+            return phraseD[2] + " " + ToCamelCase(camel) + "("+(suite.Count() > 3 ? suite[1] +" "+ suite[2] : "") +") {";
+        }
+        return "";
     }
 
     private static string TraitementFIN(string[] phraseD)
@@ -286,5 +313,37 @@ public class Requete
         }
 
         return "\n" + code + ";";
+    }
+
+    private static string ToCamelCase(string[] inputList)
+    {
+        if (inputList.Count() > 0)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < inputList.Count(); i++)
+            {
+                string currentWord = inputList[i];
+                if (currentWord != null)
+                {
+                    if (currentWord.Count() > 0)
+                    {
+                        if (i == 0)
+                        {
+                            sb.Append(char.ToLower(currentWord[0]));
+                        }
+                        else
+                        {
+                            sb.Append(char.ToUpper(currentWord[0]));
+                        }
+
+                        sb.Append(currentWord.Substring(1));
+                    }
+                }
+            }
+
+            return sb.ToString();
+        }
+        return "";
     }
 }

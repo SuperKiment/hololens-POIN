@@ -14,7 +14,9 @@ public class TextController : MonoBehaviour
     {
         RequeteType.IF,
         RequeteType.FOR,
-        RequeteType.WHILE
+        RequeteType.WHILE,
+        RequeteType.DECLARATION_FONCTION,
+
     };
 
     private void Start()
@@ -40,7 +42,7 @@ public class TextController : MonoBehaviour
                 {
                     if (requetes[i].type != RequeteType.NULL)
                     {
-                        Debug.Log(comptIndent);
+                        //Debug.Log(comptIndent);
                         string indent = "";
                         for (int j=0; j< comptIndent; j++) indent += "   ";
 
