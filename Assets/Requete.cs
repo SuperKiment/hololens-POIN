@@ -57,7 +57,8 @@ public class Requete
     //J'ai passé 10min à initialiser ce truc chuis un ptn de génie
     public static Dictionary<RequeteType, Func<string[], string>> requeteTypeVersAction = new Dictionary<RequeteType, Func<string[], string>>()
     {
-        [RequeteType.IF] = TraitementIF
+        [RequeteType.IF] = TraitementIF,
+        [RequeteType.WHILE] = TraitementWHILE
     };
 
     public Requete(string p)
@@ -209,5 +210,10 @@ public class Requete
         string restePhrase = "";
         for (int i = 0; i < phraseD.Count(); i++) restePhrase += " " + (phraseD[i].Equals("si") ? "" : phraseD[i]);
         return "if (" + restePhrase + ") {";
+    }
+
+    private static string TraitementWHILE(string[] phraseD)
+    {
+        return "LEZ GOOOO";
     }
 }
