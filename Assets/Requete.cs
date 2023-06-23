@@ -28,12 +28,16 @@ public class Requete
         ["nouvelle variable"] = RequeteType.DECLARATION_VARIABLE,
         ["variable"] = RequeteType.VARIABLE,
         ["fonction"] = RequeteType.FONCTION,
+        ["fermer bloc"] = RequeteType.FIN,
+        ["fermer bloque"] = RequeteType.FIN,
     };
 
     //Premier tri des phrases traduisibles
     public static Dictionary<string, string> motsARemplacer = new Dictionary<string, string>()
     {
         //Plus long
+        ["décrémente"] = "--",
+        ["incrémente"] = "++",
         ["est inférieur ou égal à"] = "<=",
         ["est inférieure ou égale à"] = "<=",
         ["est supérieur ou égal à"] = ">=",
@@ -46,8 +50,12 @@ public class Requete
         ["est égale à"] = "==",
         ["ou bien"] = "||",
 
+        ["un"] = "1",
+
         ["égal"] = "=",
         ["égale"] = "=",
+
+        ["fin"] = "}",
 
         ["et puis"] = "&&",
         //Plus court
@@ -58,7 +66,10 @@ public class Requete
     public static Dictionary<RequeteType, Func<string[], string>> requeteTypeVersAction = new Dictionary<RequeteType, Func<string[], string>>()
     {
         [RequeteType.IF] = TraitementIF,
-        [RequeteType.WHILE] = TraitementWHILE
+        [RequeteType.WHILE] = TraitementWHILE,
+        [RequeteType.FOR] = TraitementFOR,
+        [RequeteType.FONCTION] = TraitementFONCTION,
+        [RequeteType.FIN] = TraitementFIN,
     };
 
     public Requete(string p)
@@ -207,13 +218,73 @@ public class Requete
 
     private static string TraitementIF(string[] phraseD)
     {
-        string restePhrase = "";
-        for (int i = 0; i < phraseD.Count(); i++) restePhrase += " " + (phraseD[i].Equals("si") ? "" : phraseD[i]);
-        return "if (" + restePhrase + ") {";
+        string code = "";
+        int indexAlors = phraseD.Count();
+        if (phraseD.Contains("alors"))
+        {
+            indexAlors = Array.IndexOf(phraseD, "alors");
+        }
+        for (int i = 1; i <= indexAlors-1; i++)
+        {
+            if (!phraseD[i].Equals("variable"))
+                code += (i == 1 ? "" : " ") + phraseD[i];
+        }
+
+        string[] actionCode = new string[phraseD.Count() - indexAlors];
+        for (int i = indexAlors + 1; i < phraseD.Count(); i++)
+        {
+            actionCode[i - indexAlors] = phraseD[i];
+        }
+
+        return "if (" + code + ") { " + ActionCode(actionCode);
     }
 
     private static string TraitementWHILE(string[] phraseD)
     {
-        return "LEZ GOOOO";
+        string code = "";
+
+        for (int i = 1; i <= phraseD.Count() - 1; i++)
+        {
+            if (!phraseD[i].Equals("variable"))
+                code += (i == 1 ? "" : " ") + phraseD[i];
+        }
+
+        return "if (" + code + ") { ";
+    }
+
+    private static string TraitementFOR(string[] phraseD)
+    {
+        string code = "";
+        string variable = phraseD[1];
+        code += variable + " = ";
+
+        int indexAllant = Array.IndexOf(phraseD, "allant");
+        int indexJusquA = Array.IndexOf(phraseD, "à");
+
+        code += phraseD[indexAllant + 2] + "; "+variable+"<"+ phraseD[indexJusquA + 1];
+
+        return "for (int " + code +"; "+variable +"++) {";
+    }
+
+    private static string TraitementFONCTION(string[] phraseD)
+    {
+        return "Faire fonction";
+    }
+
+    private static string TraitementFIN(string[] phraseD)
+    {
+        return "}";
+    }
+
+    private static string ActionCode(string[] phraseD)
+    {
+        string code = "";
+
+        for (int i = 0; i < phraseD.Count(); i++)
+        {
+            code += (i == 0 ? "" : " ") + phraseD[i];
+        }
+
+        return "\n" + code + ";";
     }
 }

@@ -34,10 +34,16 @@ public class Grammar : MonoBehaviour
 
         requetes = new List<Requete>();
 
-        Requete r = new Requete("Si la variable test est égale à la variable alors test incrémente");
+        
+        Requete r = new Requete("Si la variable test est égale à la variable test2");
         requetes.Add(r);
+
+        Requete r2 = new Requete("fermer bloc");
+        requetes.Add(r2);
+
         textePrincipal.UpdateText(requetes);
         textErreurs.UpdateText(requetes);
+        
     }
 
     void onDictationResult(string text, ConfidenceLevel confidence)

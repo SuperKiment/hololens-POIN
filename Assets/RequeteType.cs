@@ -7,5 +7,6 @@ public enum RequeteType
     VARIABLE,
     FOR,
     WHILE,
-    NULL
+    NULL,
+    FIN,
 }

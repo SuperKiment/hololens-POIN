@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -8,6 +9,13 @@ public class TextController : MonoBehaviour
     private TextMeshPro textMesh;
     public List<Requete> requetes;
     public bool isErreurs;
+
+    RequeteType[] indenteurs =
+    {
+        RequeteType.IF,
+        RequeteType.FOR,
+        RequeteType.WHILE
+    };
 
     private void Start()
     {
@@ -25,20 +33,32 @@ public class TextController : MonoBehaviour
             if (requetes != null)
             {
                 //Debug.Log("update de texte");
+                int comptIndent = 0;
 
                 textMesh.text = "";
                 for (int i = 0; i < requetes.Count; i++)
                 {
                     if (requetes[i].type != RequeteType.NULL)
-                        textMesh.text += requetes[i].codeSortant + "\n";
+                    {
+                        Debug.Log(comptIndent);
+                        string indent = "";
+                        for (int j=0; j< comptIndent; j++) indent += "   ";
+
+                        if (requetes[i].type == RequeteType.FIN) comptIndent--;
+
+                        textMesh.text += indent+requetes[i].codeSortant + "\n";
+
+                        if (indenteurs.Contains(requetes[i].type)) comptIndent++;
+                    }
 
                 }
             }
-        } else
+        }
+        else
         {
-            if (req[req.Count-1].type == RequeteType.NULL)
+            if (req[req.Count - 1].type == RequeteType.NULL)
             {
-                ChangeText("Phrase non reconnue : " + req[req.Count-1].phraseDeBase);
+                ChangeText("Phrase non reconnue : " + req[req.Count - 1].phraseDeBase);
             }
         }
     }
