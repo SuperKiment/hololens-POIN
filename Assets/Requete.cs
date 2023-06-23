@@ -55,7 +55,7 @@ public class Requete
     };
 
     //J'ai passé 10min à initialiser ce truc chuis un ptn de génie
-    public Dictionary<RequeteType, Func<string[], string>> requeteTypeVersAction = new Dictionary<RequeteType, Func<string[], string>>()
+    public static Dictionary<RequeteType, Func<string[], string>> requeteTypeVersAction = new Dictionary<RequeteType, Func<string[], string>>()
     {
         [RequeteType.IF] = TraitementIF
     };
@@ -151,7 +151,8 @@ public class Requete
         //Eh wola ce truc m'a pété le crane mais qu'est-ce que c'est pratique
         return requeteTypeVersAction[type](phraseD);
 
-        /*
+
+        /*                  Switch case de avant que ça soit un dico
         switch (type)
         {
             case RequeteType.NULL:
@@ -205,6 +206,8 @@ public class Requete
 
     private static string TraitementIF(string[] phraseD)
     {
-        return "LEZ GOOO";
+        string restePhrase = "";
+        for (int i = 0; i < phraseD.Count(); i++) restePhrase += " " + (phraseD[i].Equals("si") ? "" : phraseD[i]);
+        return "if (" + restePhrase + ") {";
     }
 }
