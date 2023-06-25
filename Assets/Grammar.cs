@@ -33,18 +33,6 @@ public class Grammar : MonoBehaviour
         dictationRecognizer.Start();
 
         requetes = new List<Requete>();
-
-        
-        Requete r = new Requete("Si la variable test est égale à la variable test2");
-        requetes.Add(r);
-
-        Requete r2 = new Requete("fermer bloc");
-        requetes.Add(r2);
-
-        requetes.Add(new Requete("nouvelle fonction entier bonjour salut hehehe mloi prenant string coucou bonjour"));
-
-        textePrincipal.UpdateText(requetes);
-        textErreurs.UpdateText(requetes);
         
     }
 

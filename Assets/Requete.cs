@@ -250,7 +250,7 @@ public class Requete
                 code += (i == 1 ? "" : " ") + phraseD[i];
         }
 
-        return "if (" + code + ") { ";
+        return "while (" + code + ") { ";
     }
 
     private static string TraitementFOR(string[] phraseD)
