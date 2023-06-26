@@ -31,6 +31,7 @@ public class Requete
         ["variable"] = RequeteType.VARIABLE,
         ["fonction"] = RequeteType.FONCTION,
         ["fermer bloc"] = RequeteType.FIN,
+        ["fermer blocs"] = RequeteType.FIN,
         ["fermer bloque"] = RequeteType.FIN,
     };
 
@@ -54,6 +55,12 @@ public class Requete
 
         ["un"] = "1",
 
+        ["entier"] = "int",
+        ["chaîne de caractères"] = "string",
+        ["chaîne de caractère"] = "string",
+        ["chaînes de caractères"] = "string",
+        ["chaînes de caractère"] = "string",
+
         ["égal"] = "=",
         ["égale"] = "=",
 
@@ -71,6 +78,8 @@ public class Requete
         [RequeteType.FONCTION] = TraitementFONCTION,
         [RequeteType.FIN] = TraitementFIN,
         [RequeteType.DECLARATION_FONCTION] = TraitementDECLARATIONFONCTION,
+        [RequeteType.DECLARATION_VARIABLE] = TraitementDECLARATIONVARIABLE,
+        [RequeteType.VARIABLE] = TraitementVARIABLE,
     };
 
     public Requete(string p)
@@ -89,7 +98,7 @@ public class Requete
         phraseDeBase = RemplacerMots(phraseDeBase);
 
         //On enleve les parasites
-        Decoupe();
+        phraseDecoupee = Decoupe(phraseDeBase);
 
         //Recréation de la phrase dans le code sortant
         for (int i = 0; i < phraseDecoupee.Length; i++)
@@ -106,27 +115,35 @@ public class Requete
 
     }
 
-    private void Decoupe()
+
+
+
+    private string[] Decoupe(string phrase)
     {
-        phraseDecoupee = phraseDeBase.Split(' ');
+        string[] phraseD = phraseDeBase.Split(' ');
         List<string> mots = new List<string>();
 
         //On enlève tous les mots à supprimer
-        for (int i = 0; i < phraseDecoupee.Length; i++)
+        for (int i = 0; i < phraseD.Length; i++)
         {
-            if (!motsASupprimer.Contains(phraseDecoupee[i]))
+            if (!motsASupprimer.Contains(phraseD[i]))
             {
-                mots.Add(phraseDecoupee[i]);
+                mots.Add(phraseD[i]);
             }
         }
 
-        phraseDecoupee = new string[mots.Count];
+        phraseD = new string[mots.Count];
 
-        for (int i = 0; i < phraseDecoupee.Length; i++)
+        for (int i = 0; i < phraseD.Length; i++)
         {
-            phraseDecoupee[i] = mots[i];
+            phraseD[i] = mots[i];
         }
+
+        if (phraseD[0].Count() < 2) phraseD = GetTail(phraseD, 1);
+
+        return phraseD;
     }
+
     private RequeteType DefinirRequete()
     {
         //Si on a plus qu'un mot
@@ -158,7 +175,9 @@ public class Requete
         }
         */
     }
+
     public bool aQuelqueChose() => (codeSortant != null && codeSortant.Length > 0 ? true : false);
+
     private string TransformerEnCode(string[] phraseD)
     {
         //Eh wola ce truc m'a pété le crane mais qu'est-ce que c'est pratique
@@ -204,18 +223,8 @@ public class Requete
 
         return baseStr;
     }
-    private static string RemplacerPortionString(string source, string portionARemplacer, string nouvellePortion)
-    {
-        int index = source.IndexOf(portionARemplacer);
 
-        if (index != -1)
-        {
-            source = source.Remove(index, portionARemplacer.Length);
-            source = source.Insert(index, nouvellePortion);
-        }
-
-        return source;
-    }
+    //=========================TRAITEMENT REQUETE VERS CODE
 
     private static string TraitementIF(string[] phraseD)
     {
@@ -231,11 +240,7 @@ public class Requete
                 code += (i == 1 ? "" : " ") + phraseD[i];
         }
 
-        string[] actionCode = new string[phraseD.Count() - indexAlors];
-        for (int i = indexAlors + 1; i < phraseD.Count(); i++)
-        {
-            actionCode[i - indexAlors] = phraseD[i];
-        }
+        string[] actionCode = GetTail(phraseD, indexAlors);
 
         return "if (" + code + ") { " + ActionCode(actionCode);
     }
@@ -298,6 +303,27 @@ public class Requete
         return "";
     }
 
+    private static string TraitementDECLARATIONVARIABLE(string[] phraseD)
+    {
+        if (phraseD.Count() >= 4)
+        {
+            return phraseD[2] + " " + ToCamelCase(GetTail(phraseD, 3))+";";
+        }
+        return "";
+    }
+
+    private static string TraitementVARIABLE(string[] phraseD)
+    {
+        string resString = "";
+        
+        for (int i=1; i< phraseD.Count(); i++)
+        {
+            resString += phraseD[i];
+        }
+
+        return resString+";";
+    }
+
     private static string TraitementFIN(string[] phraseD)
     {
         return "}";
@@ -305,15 +331,21 @@ public class Requete
 
     private static string ActionCode(string[] phraseD)
     {
-        string code = "";
-
-        for (int i = 0; i < phraseD.Count(); i++)
+        if (phraseD.Count() > 0)
         {
-            code += (i == 0 ? "" : " ") + phraseD[i];
-        }
+            string code = "";
 
-        return "\n" + code + ";";
+            for (int i = 0; i < phraseD.Count(); i++)
+            {
+                code += (i == 0 ? "" : " ") + phraseD[i];
+            }
+
+            return "\n" + code + ";";
+        }
+        return "";
     }
+
+    //============================= FONCTIONS UTILES
 
     private static string ToCamelCase(string[] inputList)
     {
@@ -345,5 +377,30 @@ public class Requete
             return sb.ToString();
         }
         return "";
+    }
+    public static string[] GetTail(string[] arr, int skipCount)
+    {
+        if (skipCount >= arr.Length)
+        {
+            return new string[0];
+        }
+
+        int tailLength = arr.Length - skipCount;
+        string[] tail = new string[tailLength];
+        Array.Copy(arr, skipCount, tail, 0, tailLength);
+
+        return tail;
+    }
+    private static string RemplacerPortionString(string source, string portionARemplacer, string nouvellePortion)
+    {
+        int index = source.IndexOf(portionARemplacer);
+
+        if (index != -1)
+        {
+            source = source.Remove(index, portionARemplacer.Length);
+            source = source.Insert(index, nouvellePortion);
+        }
+
+        return source;
     }
 }

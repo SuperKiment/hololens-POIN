@@ -44,9 +44,10 @@ public class TextController : MonoBehaviour
                     {
                         //Debug.Log(comptIndent);
                         string indent = "";
-                        for (int j=0; j< comptIndent; j++) indent += "   ";
 
                         if (requetes[i].type == RequeteType.FIN) comptIndent--;
+
+                        for (int j = 0; j < comptIndent; j++) indent += "   ";
 
                         textMesh.text += indent+requetes[i].codeSortant + "\n";
 
