@@ -40,6 +40,14 @@ public class Grammar : MonoBehaviour
     {
         Debug.Log("Phrase trouvée : " + text);
 
+        if (text.Equals("Sauvegarder")) textePrincipal.SaveTextToFile(textePrincipal.textMesh.text, "Exports", "export.txt");
+        if (text.Equals("sauvegarder")) textePrincipal.SaveTextToFile(textePrincipal.textMesh.text, "Exports", "export.txt");
+        if (text.Equals("sauvegardé")) textePrincipal.SaveTextToFile(textePrincipal.textMesh.text, "Exports", "export.txt");
+        if (text.Equals("Sauvegardé")) textePrincipal.SaveTextToFile(textePrincipal.textMesh.text, "Exports", "export.txt");
+        if (text.Equals("Sauvegardée")) textePrincipal.SaveTextToFile(textePrincipal.textMesh.text, "Exports", "export.txt");
+        if (text.Equals("sauvegardée")) textePrincipal.SaveTextToFile(textePrincipal.textMesh.text, "Exports", "export.txt");
+
+
         Requete r = new Requete(text);
         //Si la requete n'est pas vide
         if (r.aQuelqueChose())

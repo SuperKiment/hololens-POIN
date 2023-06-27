@@ -55,14 +55,22 @@ public class Requete
 
         ["un"] = "1",
 
+        ["fois"] = "*",
+        ["divisé par"] = "/",
+        ["divisée par"] = "/",
+        ["diviser par"] = "/",
+        ["modulo"] = "%",
+        ["moins"] = "-",
+        ["plus"] = "+",
+
         ["entier"] = "int",
         ["chaîne de caractères"] = "string",
         ["chaîne de caractère"] = "string",
         ["chaînes de caractères"] = "string",
         ["chaînes de caractère"] = "string",
 
-        ["égal"] = "=",
         ["égale"] = "=",
+        ["égal"] = "=",
 
         ["et puis"] = "&&",
         //Plus court
